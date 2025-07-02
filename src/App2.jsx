@@ -48,7 +48,6 @@ function App() {
         CONTRACT_ADDRESS
       );
       setContract(ctr);
-     
 
       const currentCount = await ctr.methods.getCount().call();
       console.log("🟢 Current Count:", currentCount);
@@ -60,6 +59,12 @@ function App() {
 
   async function increment() {
     try {
+      console.log("🟢 Incrementing count...");
+      // 1. Estimate gas before sending
+      const gas = await contract.methods.increment().estimateGas({
+        from: account,
+      });
+      console.log("🟡 Estimated Gas:", gas);
       await contract.methods.increment().send({ from: account });
       const newCount = await contract.methods.getCount().call();
       setCount(newCount);
@@ -78,7 +83,10 @@ function App() {
           <button onClick={increment}>Increment</button>
         </>
       )}
-        <CounterListener contractAddress={CONTRACT_ADDRESS} onCountChange={setCount} />
+      {/* <CounterListener
+        contractAddress={CONTRACT_ADDRESS}
+        onCountChange={setCount}
+      /> */}
     </div>
   );
 }
