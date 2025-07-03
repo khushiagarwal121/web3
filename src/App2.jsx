@@ -73,6 +73,39 @@ function App() {
     }
   }
 
+  async function manualIncrementTx() {
+    try {
+      console.log("sending manual increment transaction");
+
+      const data = web3.eth.abi.encodeFunctionCall(
+        {
+          name: "increment",
+          type: "function",
+          inputs: [],
+        },
+        []
+      );
+
+      const gas = await web3.eth.estimateGas({
+        from: account,
+        to: CONTRACT_ADDRESS,
+        data: data,
+      });
+      const tx = await web3.eth.sendTransaction({
+        from: account,
+        to: CONTRACT_ADDRESS,
+        gas: gas,
+        data: data,
+      });
+      console.log("manual transaction", tx.transactionHash);
+
+      const newCount = await contract.methods.getCount().call();
+      setCount(newCount);
+    } catch (error) {
+      console.error("manual tx error", error);
+    }
+  }
+
   return (
     <div>
       <button onClick={connectWallet}>Connect Wallet</button>
@@ -81,6 +114,7 @@ function App() {
         <>
           <p>Count: {count}</p>
           <button onClick={increment}>Increment</button>
+          <button onClick={manualIncrementTx}>Manual Increment</button>
         </>
       )}
       {/* <CounterListener

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { BrowserProvider, Contract, formatEther } from "ethers";
 import counterABI from "./abi/CounterABI.json"; // Copy ABI file to frontend
+import MovieFetcher from "./components/MovieFetcher";
 
 const CONTRACT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 
@@ -63,7 +64,21 @@ function App() {
 
   return (
     <div>
-      <button onClick={connectWallet}>Connect Wallet</button>
+      <br></br>
+      <button
+        onClick={connectWallet}
+        style={{
+          padding: "10px 20px",
+          margin: "16px",
+          borderRadius: "8px",
+          border: "1px solid #ccc",
+          backgroundColor: "#f0f0f0",
+          cursor: "pointer",
+          color: "black", 
+        }}
+      >
+        Connect Wallet
+      </button>
       {account && <p>Connected: {account}</p>}
       {count !== null && (
         <>
@@ -71,6 +86,7 @@ function App() {
           <button onClick={increment}>Increment</button>
         </>
       )}
+      <MovieFetcher />
     </div>
   );
 }
