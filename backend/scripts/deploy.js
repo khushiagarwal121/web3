@@ -7,6 +7,7 @@ const hre = require("hardhat");
 // This is the **main async function** that handles the deployment logic.
 
 async function main() {
+  // “Find the compiled artifact named Counter and prepare it for deployment.”
     // - `getContractFactory("Counter")` compiles and loads the **Counter smart contract**.
   const Counter = await hre.ethers.getContractFactory("Counter");
 //   - This **deploys the `Counter` smart contract** to the currently selected network (e.g., `localhost`, `goerli`, etc.).

@@ -1,11 +1,29 @@
 import { useState } from "react";
 import Web3 from "web3";
 import counterABI from "./abi/CounterABI.json";
-import CounterListener from "./components/CounterListener";
-
+import MovieFetcher from "./components/MovieFetcher";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import Home from "./components/Home";
+import Login from "./components/Login";
+import User from "./components/User";
 const CONTRACT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 
 function App() {
+   const router=createBrowserRouter([
+        {
+          path:"/",
+          element:<><Navbar/><Home/></>
+        },
+        {
+          path:"/login",
+          element:<><Navbar/><Login/></>
+        },
+        {
+          path:"/user/:username",
+          element:<><Navbar/><User/></>
+        }
+    ])
   // stores the Ethereum address of the user's connected wallet (from MetaMask).
   const [account, setAccount] = useState(null); // Stores connected MetaMask address
   const [count, setCount] = useState(null);
@@ -23,7 +41,7 @@ function App() {
       const web3Instance = new Web3(window.ethereum);
       // eth_requestAccounts - Requests that the user provide access to addresses
       // .request(...): a function that sends JSON-RPC requests to MetaMask..
-      // User connects wallet using eth_requestAccounts
+      // User connects wallet using eth_requestAccountsb
       // This asks the user to connect their wallet to your app.
       // pop up to connect wallet
       await window.ethereum.request({ method: "eth_requestAccounts" });
@@ -34,6 +52,10 @@ function App() {
       const address = accounts[0];
       setAccount(address);
       setWeb3(web3Instance);
+
+       // 👉 Add this to log the latest block
+    const blockNumber = await web3Instance.eth.getBlockNumber();
+    console.log("🔢 Latest Block Number:", blockNumber);
       // balance in wei
       const balanceWei = await web3Instance.eth.getBalance(address);
       //   balance converted to etehr
@@ -107,20 +129,33 @@ function App() {
   }
 
   return (
-    <div>
-      <button onClick={connectWallet}>Connect Wallet</button>
+    <div style={{
+      margin: "20px",
+    }}>
+      <div>hello</div>
+      {/* <Navbar/> */}
+      <RouterProvider router={router}/>
+      <button onClick={connectWallet} style={{
+        backgroundColor: "green",
+      }}>Connect Wallet</button>
       {account && <p>Connected: {account}</p>}
       {count !== null && (
         <>
           <p>Count: {count}</p>
-          <button onClick={increment}>Increment</button>
-          <button onClick={manualIncrementTx}>Manual Increment</button>
+          <button onClick={increment} style={{
+            backgroundColor:"grey"
+          }}>Increment</button>
+          <button onClick={manualIncrementTx} style={{
+            marginLeft: "10px",
+            backgroundColor:"grey"
+          }}>Manual Increment</button>
         </>
       )}
       {/* <CounterListener
         contractAddress={CONTRACT_ADDRESS}
         onCountChange={setCount}
       /> */}
+       <MovieFetcher />
     </div>
   );
 }

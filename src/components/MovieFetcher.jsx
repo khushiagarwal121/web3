@@ -1,10 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 function MovieFetcher() {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const fetchCountRef = useRef(0);
+  const topRef = useRef(null);
   //   useEffect to fetch movies from the Ghibli API
   //   This hook runs once when the component mounts (empty dependency array [])
   useEffect(() => {
@@ -12,7 +14,8 @@ function MovieFetcher() {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch("https://ghibliapi.vercel.app/films");
+        const res = await fetch("/api/films");
+        console.log("res:", res);
         if (!res.ok) {
           throw new Error("Failed to fetch movies");
         }
@@ -22,8 +25,9 @@ function MovieFetcher() {
         // Parses the body as JSON and converts it into a JavaScript object
         const data = await res.json();
         console.log("data:", data);
-        console.log("r4s", res);
         setMovies(data);
+        fetchCountRef.current += 1;
+        console.log("📦 Movies fetched: ", fetchCountRef.current, "times");
       } catch (err) {
         setError(err.message);
       } finally {
@@ -32,7 +36,25 @@ function MovieFetcher() {
     };
 
     fetchMovies();
+    // 👇 Set interval to auto-refresh
+    // interval has id
+    const interval = setInterval(() => {
+      console.log("⏳ Refetching movies...");
+      fetchMovies();
+    }, 300000); // 300 second
+    // console.log("interval:", interval);
+    // 👇 Cleanup function
+    return () => {
+      clearInterval(interval);
+      console.log("🛑 Interval cleared on unmount");
+    };
   }, []);
+  // scroll to where movies are dispalyed
+useEffect(() => {
+  if (movies.length > 0 && topRef.current) {
+    topRef.current.scrollIntoView({ behavior: "smooth" });
+  }
+}, [movies]);
 
   // useEffect to update the document title when movies are fetched
   useEffect(() => {
@@ -48,13 +70,32 @@ function MovieFetcher() {
       }
     };
     window.addEventListener("keydown", handleKey);
-    return ()=>window.removeEventListener("keydown",handleKey)
+    return () => window.removeEventListener("keydown", handleKey);
+  }, []);
+
+  // og window resize events
+  useEffect(() => {
+    function handleResize() {
+      console.log(
+        "📐 Window resized:",
+        window.innerWidth,
+        "x",
+        window.innerHeight
+      );
+    }
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      console.log("🛑 Resize listener removed");
+    };
   }, []);
   if (loading) return <p>loading movies...</p>;
   if (error) return <p>Error : {error}</p>;
-  
+
   return (
     <div>
+    <div ref={topRef}></div>
       <h1>Movies</h1>
       <ul>
         {movies.map((movie) => (
