@@ -4,11 +4,21 @@ function Navbar() {
   return (
     <div>
       <nav>
-        <NavLink className={(e)=>{return e.isActive?"red":""}} to="/">
+        <NavLink
+          className={(e) => {
+            return e.isActive ? "red" : "";
+          }}
+          to="/"
+        >
           <li>Home</li>
         </NavLink>
-  
-        <NavLink className={(e)=>{return e.isActive?"red":""}} to="/login">
+
+        <NavLink
+          className={(e) => {
+            return e.isActive ? "red" : "";
+          }}
+          to="/login"
+        >
           <li>Login</li>
         </NavLink>
       </nav>

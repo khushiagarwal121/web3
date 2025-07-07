@@ -7,23 +7,38 @@ import Navbar from "./components/Navbar";
 import Home from "./components/Home";
 import Login from "./components/Login";
 import User from "./components/User";
-const CONTRACT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+const CONTRACT_ADDRESS = "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9";
 
 function App() {
-   const router=createBrowserRouter([
-        {
-          path:"/",
-          element:<><Navbar/><Home/></>
-        },
-        {
-          path:"/login",
-          element:<><Navbar/><Login/></>
-        },
-        {
-          path:"/user/:username",
-          element:<><Navbar/><User/></>
-        }
-    ])
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: (
+        <>
+          <Navbar />
+          <Home />
+        </>
+      ),
+    },
+    {
+      path: "/login",
+      element: (
+        <>
+          <Navbar />
+          <Login />
+        </>
+      ),
+    },
+    {
+      path: "/user/:username",
+      element: (
+        <>
+          <Navbar />
+          <User />
+        </>
+      ),
+    },
+  ]);
   // stores the Ethereum address of the user's connected wallet (from MetaMask).
   const [account, setAccount] = useState(null); // Stores connected MetaMask address
   const [count, setCount] = useState(null);
@@ -48,20 +63,16 @@ function App() {
       // Now that the wallet is connected, this line gets an array of wallet addresses.
       // getAccounts - Returns a list of accounts the node controls.
       const accounts = await web3Instance.eth.getAccounts();
-      console.log("🟢 Accounts:", accounts);
       const address = accounts[0];
       setAccount(address);
       setWeb3(web3Instance);
 
-       // 👉 Add this to log the latest block
-    const blockNumber = await web3Instance.eth.getBlockNumber();
-    console.log("🔢 Latest Block Number:", blockNumber);
+      // 👉 Add this to log the latest block
+      const blockNumber = await web3Instance.eth.getBlockNumber();
       // balance in wei
       const balanceWei = await web3Instance.eth.getBalance(address);
       //   balance converted to etehr
       const balanceEth = web3Instance.utils.fromWei(balanceWei, "ether");
-      console.log("🟢 Address:", address);
-      console.log("🟢 Balance in ETH:", balanceEth);
       // loads the contract using ABI and address
       // web3Instance.eth.Contract – A Web3.js method to create a contract object that can interact with a deployed smart contract.
       // The web3.eth.Contract object makes it easy to interact with smart contracts on the ethereum blockchain.
@@ -72,7 +83,6 @@ function App() {
       setContract(ctr);
 
       const currentCount = await ctr.methods.getCount().call();
-      console.log("🟢 Current Count:", currentCount);
       setCount(currentCount);
     } catch (error) {
       console.error("❌ Error connecting wallet:", error);
@@ -81,12 +91,10 @@ function App() {
 
   async function increment() {
     try {
-      console.log("🟢 Incrementing count...");
       // 1. Estimate gas before sending
       const gas = await contract.methods.increment().estimateGas({
         from: account,
       });
-      console.log("🟡 Estimated Gas:", gas);
       await contract.methods.increment().send({ from: account });
       const newCount = await contract.methods.getCount().call();
       setCount(newCount);
@@ -97,8 +105,6 @@ function App() {
 
   async function manualIncrementTx() {
     try {
-      console.log("sending manual increment transaction");
-
       const data = web3.eth.abi.encodeFunctionCall(
         {
           name: "increment",
@@ -129,33 +135,51 @@ function App() {
   }
 
   return (
-    <div style={{
-      margin: "20px",
-    }}>
+    <div
+      style={{
+        margin: "20px",
+      }}
+    >
+      <RouterProvider router={router} />
       <div>hello</div>
       {/* <Navbar/> */}
-      <RouterProvider router={router}/>
-      <button onClick={connectWallet} style={{
-        backgroundColor: "green",
-      }}>Connect Wallet</button>
+
+      <button
+        onClick={connectWallet}
+        style={{
+          backgroundColor: "green",
+        }}
+      >
+        Connect Wallet
+      </button>
       {account && <p>Connected: {account}</p>}
       {count !== null && (
         <>
           <p>Count: {count}</p>
-          <button onClick={increment} style={{
-            backgroundColor:"grey"
-          }}>Increment</button>
-          <button onClick={manualIncrementTx} style={{
-            marginLeft: "10px",
-            backgroundColor:"grey"
-          }}>Manual Increment</button>
+          <button
+            onClick={increment}
+            style={{
+              backgroundColor: "grey",
+            }}
+          >
+            Increment
+          </button>
+          <button
+            onClick={manualIncrementTx}
+            style={{
+              marginLeft: "10px",
+              backgroundColor: "grey",
+            }}
+          >
+            Manual Increment
+          </button>
         </>
       )}
       {/* <CounterListener
         contractAddress={CONTRACT_ADDRESS}
         onCountChange={setCount}
       /> */}
-       <MovieFetcher />
+      <MovieFetcher />
     </div>
   );
 }

@@ -3,7 +3,7 @@ import { BrowserProvider, Contract, formatEther } from "ethers";
 import counterABI from "./abi/CounterABI.json"; // Copy ABI file to frontend
 import MovieFetcher from "./components/MovieFetcher";
 
-const CONTRACT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+const CONTRACT_ADDRESS = "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9";
 
 function App() {
   const [account, setAccount] = useState(null);
@@ -36,6 +36,13 @@ function App() {
       setAccount(address);
       const network = await provider.getNetwork();
       console.log("🟢 Network:", network);
+
+      const block = await provider.getBlock();
+      console.log("🟢 Block:", block);
+
+     const gasPrice = await provider.getFeeData();
+
+      console.log("🟢 Gas Price:", gasPrice);
       //Contract - This is a class from Ethers.js used to interact with deployed smart contracts.
       // The ABI (Application Binary Interface) is like a menu of functions and events the smart contract exposes.
       // It describes what functions exist (e.g., getCount(), increment()).
@@ -55,9 +62,10 @@ function App() {
   }
 
   async function increment() {
+    // sending a transaction
     const tx = await contract.increment();
     // confirms it was mined
-    await tx.wait();
+    await tx.wait();// waits for it to be mined ⛏️ and is important
     const newCount = await contract.getCount();
     setCount(newCount.toString());
   }
@@ -74,7 +82,7 @@ function App() {
           border: "1px solid #ccc",
           backgroundColor: "#f0f0f0",
           cursor: "pointer",
-          color: "black", 
+          color: "black",
         }}
       >
         Connect Wallet
